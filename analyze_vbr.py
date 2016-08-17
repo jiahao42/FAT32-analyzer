@@ -11,7 +11,7 @@ def analyze_vbr(sectors_to_skip, device_name, filename):
     result = commands.getstatusoutput(
         "dd if=/dev/" + device_name + " skip=" + str(sectors_to_skip) + " count=1 > " + filename)
     if result[0] != 0:
-        print "something is WRONG !!! Please CHECK your input !!!"
+        print "WRONG device name !!! Please CHECK your input !!!"
         return
     fp = open(filename, 'r')
     content = fp.read(512)
@@ -38,12 +38,15 @@ def analyze_vbr(sectors_to_skip, device_name, filename):
     output_number(to_integer(little_endian(sectors_per_cluster, 1), 1))
     print "Size in sectors of reserved area: "
     output_number(to_integer(little_endian(size_in_sectors_reserved_area, 2), 2))
+    set_reserved_area(size_in_sectors_reserved_area)
     print "Number of FATs: "
     output_number(to_integer(little_endian(number_of_fats, 1), 1))
     print "Sectors of one FAT area: "
     output_number(to_integer(little_endian(sectors_of_one_fat, 4), 4))
+    set_fat(sectors_of_one_fat)
     print "Cluster where root directory can be found: "
     output_number(to_integer(little_endian(cluster_of_root_directory, 4), 4))
+    set_start_cluster(cluster_of_root_directory)
     print "Maximum number of files in the root directory: "
     output_number(to_integer(little_endian(max_files_root_directory, 2), 2))
     print "**********************************************"

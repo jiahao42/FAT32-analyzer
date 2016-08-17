@@ -3,16 +3,20 @@
 import commands
 from util import *
 import sys
+import ctypes
+
+undelete_lib = ctypes.CDLL('/mnt/hgfs/For-Linux/digital_forensics/undelete_lib.so')
 
 
 def find_root_directory(mbr, reserved_area, fat, start_cluster, sectors_per_cluster, device_name):
     root_directory = int(mbr) + int(reserved_area) + 2 * int(fat) + (int(start_cluster) - 2) * int(sectors_per_cluster)
     filename = device_name + "_root_directory"
-    print "dd if=/dev/" + device_name + " skip=" + str(root_directory) + " count=" + str(get_sectors()) + ">" + filename
+    # print "dd if=/dev/" + device_name + " skip=" + str(root_directory)
+    # + " count=" + str(get_sectors()) + ">" + filename
     result = commands.getstatusoutput(
         "dd if=/dev/" + device_name + " skip=" + str(root_directory) + " count=" + str(get_sectors()) + ">" + filename)
     if result[0] != 0:
-        print "something is WRONG !!! Please CHECK your input !!!"
+        print "WRONG device name !!! Please CHECK your input !!!"
         return
     recover_name = []  # 0-11
     create_day = []  # 16-17
@@ -34,6 +38,14 @@ def find_root_directory(mbr, reserved_area, fat, start_cluster, sectors_per_clus
         if is_short(temp):  # 是短文件名
             if is_delete(temp):
                 is_done(accumulation, sum_bytes)
+                offset = root_directory * 512 + 10   # + accumulation - 64
+                print "accumulation: ",
+                print accumulation
+                print "offset: ",
+                print offset
+                path = "/dev/" + device_name
+                real_path = ctypes.create_string_buffer(path)
+                undelete_lib.undelete_file(real_path, offset)
                 # temp = fp.read(32)
                 # accumulation += 32
             else:

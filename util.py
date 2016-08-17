@@ -84,7 +84,7 @@ def output_date(date):
 def output_file_size(size):
     file_size = size[0] * 0x1000000 + size[1] * 0x10000 + size[2] * 0x100 + size[3]
     if file_size > 1048546:
-        file_size /= 1024
+        file_size /= 1048546
         print file_size,
         print "MegaBytes\n"
     elif file_size > 10240:

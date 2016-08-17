@@ -32,6 +32,7 @@ def show_help():
     print '%-25s' % "-a, -- all",
     print '%-40s' % "analyze all the things"
 
+
 if len(sys.argv) == 1:
     sys.exit("Please input your argument !!! Type -h to get some help ")
 elif sys.argv[1] == '-h':  # 获取帮助
@@ -54,19 +55,18 @@ elif sys.argv[1] == '-v':  # 找到并分析VBR
     filename = device_name + "_VBR"
     sectors_to_skip = sys.argv[3]
     analyze_vbr(sectors_to_skip, device_name, filename)
-elif sys.argv[1] == '-r':   # 分析根目录情况 还原出文件名
+elif sys.argv[1] == '-r':  # 分析根目录情况 还原出文件名
     if len(sys.argv) < 8:
         sys.exit("The argument should be mbr, reserved_area, fat, start_cluster, sectors_per_cluster and device_name")
     find_root_directory(sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6], sys.argv[7])
-elif sys.argv[1] == '-a':   # 自动执行所有命令
+elif sys.argv[1] == '-a':  # 自动执行所有命令
     device_name = raw_input("please input your device name: \n")
     find_lba(device_name)
     set_device_name(device_name)
     filename = device_name + "_VBR"
     # sectors_to_skip = raw_input("Please input the sectors to skip: ")
     analyze_vbr(global_var.lba_address, device_name, filename)
+    find_root_directory(global_var.lba_address, global_var.reserved_area, global_var.fat, global_var.start_cluster,
+                        global_var.sectors_per_cluster, global_var.device_name)
 else:
     show_help()
-
-
-
