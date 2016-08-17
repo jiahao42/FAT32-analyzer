@@ -24,9 +24,9 @@ def output_char(data):
     print output
 
 
-def get_certain_info(partition, start, length, address):  # 获取一段数据中特定几个字节的信息
+def get_certain_info(data, start, length, address):  # 获取一段数据中特定几个字节的信息
     for i in range(length):
-        address.append(partition[start + i])
+        address.append(data[start + i])
     # print "this is the certain info: "
     # print address
     return address
