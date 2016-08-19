@@ -3,6 +3,7 @@
 import commands
 from util import *
 from global_var import *
+import sys
 
 # mbr + reversed area = 6782    2 * FAT = 60802     mbr + reversed area + 2 * FAT = 67584
 
@@ -11,8 +12,7 @@ def analyze_vbr(sectors_to_skip, device_name, filename):
     result = commands.getstatusoutput(
         "dd if=/dev/" + device_name + " skip=" + str(sectors_to_skip) + " count=1 > " + filename)
     if result[0] != 0:
-        print "WRONG device name !!! Please CHECK your input !!!"
-        return
+        sys.exit("Failed to execute !!! Please CHECK your input !!!")
     fp = open(filename, 'r')
     content = fp.read(512)
     fp.close()
@@ -23,6 +23,7 @@ def analyze_vbr(sectors_to_skip, device_name, filename):
     max_files_root_directory = []  # 17-18
     sectors_of_one_fat = []
     cluster_of_root_directory = []
+
     bytes_per_sector = get_certain_info(content, 11, 2, bytes_per_sector)
     sectors_per_cluster = get_certain_info(content, 13, 1, sectors_per_cluster)
     size_in_sectors_reserved_area = get_certain_info(content, 14, 2, size_in_sectors_reserved_area)

@@ -4,6 +4,7 @@ import os
 import commands
 from util import *
 from global_var import *
+import sys
 
 
 def find_lba(device_name):
@@ -13,8 +14,7 @@ def find_lba(device_name):
     # 下面通过getstatusoutput方法来获取shell命令的返回值 若没有返回成功 则打印错误信息并退出
     result = commands.getstatusoutput("dd if=/dev/" + device_name + " count=1 > " + filename)
     if result[0] != 0:
-        print "WRONG device name !!! Please CHECK your input !!!"
-        return
+        sys.exit("WRONG device name !!! Please CHECK your input !!!")
     fp = open(filename, "r")
     content = fp.read(512)
     fp.close()

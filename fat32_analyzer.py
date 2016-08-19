@@ -4,14 +4,16 @@ from util import *
 from analyze_mbr import *
 from analyze_vbr import *
 from analyze_root_directory import *
+from recover_file import *
 import global_var
 
 import sys
+import global_var
 
 
 def show_help():
     print "\nUsage: "
-    print "\tpython fat32_analyzer [options] [argument]\n"
+    print "\tpython fat32_analyzer.py [options] [argument]\n"
 
     print "Options: "
     print '%-25s' % "-h, -- help",
@@ -29,8 +31,11 @@ def show_help():
     # print '%-25s' % "-r [mbr] [reserved area] [fat] [start cluster] [sectors per cluster] [device], -- root directory"
     # print '%-40s' % "analyze the root directory"
 
-    print '%-25s' % "-a, -- all",
-    print '%-40s' % "analyze all the things"
+    print '%-25s' % "-a [device] ",
+    print '%-40s' % "analyze things above"
+
+    print '%-25s' % "-r [device] ",
+    print '%-40s' % "recover file as possible"
 
 
 if len(sys.argv) == 1:
@@ -55,12 +60,10 @@ elif sys.argv[1] == '-v':  # 找到并分析VBR
     filename = device_name + "_VBR"
     sectors_to_skip = sys.argv[3]
     analyze_vbr(sectors_to_skip, device_name, filename)
-elif sys.argv[1] == '-r':  # 分析根目录情况 还原出文件名
-    if len(sys.argv) < 8:
-        sys.exit("The argument should be mbr, reserved_area, fat, start_cluster, sectors_per_cluster and device_name")
-    find_root_directory(sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6], sys.argv[7])
 elif sys.argv[1] == '-a':  # 自动执行所有命令
-    device_name = raw_input("please input your device name: \n")
+    if len(sys.argv) == 2:
+        sys.exit("Please input your device name !!!")
+    device_name = sys.argv[2]
     find_lba(device_name)
     set_device_name(device_name)
     filename = device_name + "_VBR"
@@ -68,5 +71,19 @@ elif sys.argv[1] == '-a':  # 自动执行所有命令
     analyze_vbr(global_var.lba_address, device_name, filename)
     find_root_directory(global_var.lba_address, global_var.reserved_area, global_var.fat, global_var.start_cluster,
                         global_var.sectors_per_cluster, global_var.device_name)
+elif sys.argv[1] == '-r':
+    if len(sys.argv) == 2:
+        sys.exit("Please input your device name !!!")
+    device_name = sys.argv[2]
+    find_lba(device_name)
+    set_device_name(device_name)
+    filename = device_name + "_VBR"
+    # sectors_to_skip = raw_input("Please input the sectors to skip: ")
+    analyze_vbr(global_var.lba_address, device_name, filename)
+    print "\n**********************************************"
+    print "Here is the Bytes which has been changed: "
+    recover_file(global_var.lba_address, global_var.reserved_area, global_var.fat, global_var.start_cluster,
+                 global_var.sectors_per_cluster,
+                 global_var.device_name)
 else:
     show_help()

@@ -16,8 +16,7 @@ def find_root_directory(mbr, reserved_area, fat, start_cluster, sectors_per_clus
     result = commands.getstatusoutput(
         "dd if=/dev/" + device_name + " skip=" + str(root_directory) + " count=" + str(get_sectors()) + ">" + filename)
     if result[0] != 0:
-        print "WRONG device name !!! Please CHECK your input !!!"
-        return
+        sys.exit("Failed to execute !!! Please CHECK your input !!!")
     recover_name = []  # 0-11
     create_day = []  # 16-17
     access_day = []  # 18-19
@@ -38,14 +37,7 @@ def find_root_directory(mbr, reserved_area, fat, start_cluster, sectors_per_clus
         if is_short(temp):  # 是短文件名
             if is_delete(temp):
                 is_done(accumulation, sum_bytes)
-                offset = root_directory * 512 + 10   # + accumulation - 64
-                print "accumulation: ",
-                print accumulation
-                print "offset: ",
-                print offset
-                path = "/dev/" + device_name
-                real_path = ctypes.create_string_buffer(path)
-                undelete_lib.undelete_file(real_path, offset)
+                pass
                 # temp = fp.read(32)
                 # accumulation += 32
             else:
@@ -60,11 +52,23 @@ def find_root_directory(mbr, reserved_area, fat, start_cluster, sectors_per_clus
         else:  # 是长文件名 长文件需要再读 n * 32Bytes 数据
             if is_delete(temp):
                 is_done(accumulation, sum_bytes)
-                # temp = fp.read(32)
-                # accumulation += 32
+                one_more_line = fp.read(32)  # 一直向下读32个字节 直到第0xb个字节为0x10 或 0x20为止
+                accumulation += 32
+                temp += one_more_line  # 因为长文件至少占两行 所以直接向下读一行作为判断无风险
+                while recover_long_file_is_end(one_more_line):
+                    one_more_line = fp.read(32)
+                    accumulation += 32
+                    temp += one_more_line
+                    # temp = fp.read(32)
+                    # accumulation += 32
             else:
                 lines = ord(temp[0]) - 0x40  # 需要再读的行数
-                temp += fp.read(lines * 32)  # 文件所有的信息都在此
+                try:
+                    temp += fp.read(lines * 32)  # 文件所有的信息都在此
+                except IndexError:
+                    sys.exit(
+                        "\nThis is all the file information.\n"
+                        "If you want more,\n maybe you can change the sectors using \"-s\" \n\tBye~")
                 analyze_long_file(temp, file_info, lines)
                 accumulation += lines * 32
                 for i in file_info:
@@ -76,10 +80,15 @@ def find_root_directory(mbr, reserved_area, fat, start_cluster, sectors_per_clus
 
 def analyze_long_file(data, file_info, lines):
     file_name = []
-    for i in range(lines):  # 需要倒序读取各行数据
-        file_name = get_certain_info(data, 32 * (lines - i - 1) + 1, 10, file_name)
-        file_name = get_certain_info(data, 32 * (lines - i - 1) + 14, 12, file_name)
-        file_name = get_certain_info(data, 32 * (lines - i - 1) + 28, 4, file_name)
+    try:
+        for i in range(lines):  # 需要倒序读取各行数据
+            file_name = get_certain_info(data, 32 * (lines - i - 1) + 1, 10, file_name)
+            file_name = get_certain_info(data, 32 * (lines - i - 1) + 14, 12, file_name)
+            file_name = get_certain_info(data, 32 * (lines - i - 1) + 28, 4, file_name)
+    except IndexError:
+        sys.exit(
+            "\nThis is all the file information.\n"
+            "If you want more,\n maybe you can change the sectors using \"-s\" \n\tBye~")
     file_name = filter(lambda x: x != '\x00', file_name)
     file_name = filter(lambda x: x != '\xff', file_name)
     print "Filename: ",
@@ -97,11 +106,18 @@ def analyze_short_file(data, file_info):
     file_info[3] = get_certain_info(data, 20, 2, file_info[3])
     file_info[4] = get_certain_info(data, 26, 2, file_info[4])
     file_info[5] = get_certain_info(data, 28, 4, file_info[5])
-    for i in range(len(file_info[0])):
+    full_name = True       # 如果文件名恰好八个字节则没有空格 下面方法不适用 直接在第八个字节后加.
+    for i in range(8):
         if ord(file_info[0][i]) == 0x20:
-            file_info[0][i] = chr(0x2e)
-            break
-    file_info[0] = filter(lambda x: ord(x) != 0x20, file_info[0])
+            full_name = False       # 前八个字节里有一个空格的话就不是 Full name
+    if full_name:
+        file_info[0].insert(8,'.')
+    else:
+        for i in range(len(file_info[0])):      # 将其中一个空格替换成点
+            if ord(file_info[0][i]) == 0x20:
+                file_info[0][i] = chr(0x2e)
+                break
+    file_info[0] = filter(lambda x: ord(x) != 0x20, file_info[0])       # 去除剩余空格
     print "Filename: ",
     output_char(to_integer(file_info[0], len(file_info[0])))
     print "Create Day: ",
@@ -117,26 +133,6 @@ def analyze_short_file(data, file_info):
     print "File Size: ",
     output_file_size(to_integer(little_endian(file_info[5], 4), 4))
     # output_number(to_integer(little_endian(file_info[5], 4), 4))
-
-
-def is_short(data):  # 是否是短文件名
-    if ord(data[11]) == 0x0f:
-        return False
-    return True
-
-
-def is_delete(data):  # 是否是被删除文件
-    # print "is deleted: ",
-    if ord(data[0]) == 0x00 or ord(data[0]) == 0xe5:
-        return True
-    return False
-
-
-def is_done(accumulation, sum_bytes):
-    if accumulation >= sum_bytes:  # 若读取的字节到达了配置文件中的要求 则直接退出
-        sys.exit(
-            "\nThis is all the file information. "
-            "If you want more, maybe you can change the sectors using \"-s\" \n\tBye~")
 
 
 def analyze_last_line_of_long_file(data):

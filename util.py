@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # coding=utf-8
 import simplejson
+import sys
 
 
 def to_integer(data, length):  # 转换成ascii码的码值
@@ -25,8 +26,13 @@ def output_char(data):
 
 
 def get_certain_info(data, start, length, address):  # 获取一段数据中特定几个字节的信息
-    for i in range(length):
-        address.append(data[start + i])
+    try:
+        for i in range(length):
+            address.append(data[start + i])
+    except IndexError:
+        sys.exit(
+            "\nThis is all the file information.\n"
+            "If you want more,\n maybe you can change the sectors using \"-s\" \n\tBye~")
     # print "this is the certain info: "
     # print address
     return address
@@ -45,7 +51,7 @@ def change_sectors(sectors):  # 修改默认读入的sector数 通过 -s 选项�
     fp.close()
 
 
-def get_sectors():     # 读取文件的配置信息 读入的sector数
+def get_sectors():  # 读取文件的配置信息 读入的sector数
     fp = open("setting", 'r')
     content = fp.read()
     temp = '{' + content + '}'
@@ -55,7 +61,7 @@ def get_sectors():     # 读取文件的配置信息 读入的sector数
     return temp_dict["sectors"]
 
 
-def show_sectors():     # 读取文件的配置信息 读入的sector数
+def show_sectors():  # 读取文件的配置信息 读入的sector数
     fp = open("setting", 'r')
     content = fp.read()
     temp = '{' + content + '}'
@@ -65,11 +71,11 @@ def show_sectors():     # 读取文件的配置信息 读入的sector数
 
 
 def analyze_date(data):
-    date_number = data[0] * 0x100 + data[1]
-    year = date_number >> 9
-    month = (date_number & 0b0000000111100000) >> 5
-    day = (date_number & 0b0000000000011111)
-    date_sum = [year,month,day]
+    date_array = data[0] * 0x100 + data[1]
+    year = date_array >> 9
+    month = (date_array & 0b0000000111100000) >> 5
+    day = (date_array & 0b0000000000011111)
+    date_sum = [year, month, day]
     return date_sum
 
 
@@ -96,15 +102,37 @@ def output_file_size(size):
         print "Bytes\n"
 
 
+def is_short(data):  # 是否是短文件名
+    if ord(data[11]) == 0x0f:
+        return False
+    return True
+
+
+def is_delete(data):  # 是否是被删除文件
+    # print "is deleted: ",
+    # if ord(data[0]) == 0x00 or ord(data[0]) == 0xe5:
+    if ord(data[0]) == 0xe5:
+        return True
+    return False
+
+
+def is_done(accumulation, sum_bytes):
+    if accumulation >= sum_bytes:  # 若读取的字节到达了配置文件中的要求 则直接退出
+        sys.exit(
+            "\nThis is all the file information.\n"
+            "If you want more,\n maybe you can change the sectors using \"-s\" \n\tBye~")
+
+
+def recover_long_file_is_end(data):
+    signal = ord(data[11])
+    essential_symbol = [0x08, 0x10, 0x20, 0x04, 0x02, 0x01]
+    if signal in essential_symbol:
+        return False
+    else:
+        return True
+
+
 if __name__ == '__main__':
     sectors = raw_input("Please input the number of sectors that you want to read: ")
     change_sectors(sectors)
     show_sectors()
-
-
-
-
-
-
-
-
