@@ -3,7 +3,7 @@
 
 ### Usage: 
 	python fat32_analyzer.py [options] [argument]
-
+	
 
 ### Options: 
 ```
@@ -19,6 +19,15 @@
 
 -r [device]               recover file as possible       
 ```
+
+
+### Example:
+* on Linux:
+	* just type in the terminal ```python fat32_analyzer.py -r sdb```.
+	* then you can recover the files that recently deleted on sdb.
+	* As for the device name, you can use the ``` fdisk -l ```command to see.
+	
+
 
 
 ```
