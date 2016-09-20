@@ -1,6 +1,24 @@
 # FAT32-analyzer
 
+##### 本工具用于分析FAT32文件系统，分析内容包括包括：
+* MBR(Master Boot Record) - 使用-m参数
+* VBR(Volumn Boot Record) - 使用-v参数 同时需要输入需跳过的扇区数 该项数据可以在-m指令中找到
 
+##### 大多数情况下，请直接用-a选项分析全部
+
+
+请注意本工具的用法，本工具仅运行在Linux环境下：
+* 将需要分析或者恢复文件的设备通过USB口连接到主机
+* 除-s/-h参数选项外，使用其他选项运行时还需输入设备名称，设备名称请使用fdisk -l命令来查看。
+
+
+##### 同时，本工具也可以用于FAT32设备的文件恢复工作，可以恢复最近删除的文件，参数为-r。
+
+#### 请注意，恢复文件只能恢复文件内容，文件名无法完全恢复，且文件内容必须在Linux系统下查看。
+
+---
+
+	
 ### Usage: 
 	python fat32_analyzer.py [options] [argument]
 	
@@ -26,8 +44,10 @@
 	* just type in the terminal ```python fat32_analyzer.py -r sdb```.
 	* then you can recover the files that recently deleted on sdb.
 	* As for the device name, you can use the ``` fdisk -l ```command to see.
-	
 
+#### Attention:
+* This tool can only run on Linux.
+* This tool can only undelete the files that are RECENTLY DELETED.You can find the completed content of the undeleted files on Linux,but the undeleted files'names might be a little different.
 
 
 ```
