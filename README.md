@@ -16,6 +16,7 @@
 
 #### 请注意，恢复文件只能恢复文件内容，文件名无法完全恢复，且文件内容必须在Linux系统下查看。
 
+### 关于FAT32文件系统的更多信息，请移步[wiki](https://github.com/Jameeeees/FAT32-analyzer/wiki/FAT32-reference)。
 ---
 
 	
@@ -49,6 +50,7 @@
 * This tool can only run on Linux.
 * This tool can only undelete the files that are RECENTLY DELETED.You can find the completed content of the undeleted files on Linux,but the undeleted files'names might be a little different.
 
+### If you want to know more about FAT32 file system,please go to [wiki](https://github.com/Jameeeees/FAT32-analyzer/wiki/FAT32-reference).
 
 ```
                                                                             Created by James 
