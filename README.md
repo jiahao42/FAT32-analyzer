@@ -57,11 +57,11 @@
                                                                             2016.8.15-2016.8.20
 ```
 
-[!How to use it to analyze MBR?](https://raw.githubusercontent.com/Jameeeees/FAT32-analyzer/master/images/1.PNG)
-[!How to use it to analyze VBR?](https://raw.githubusercontent.com/Jameeeees/FAT32-analyzer/master/images/2.PNG)
-[!File analyzation](https://raw.githubusercontent.com/Jameeeees/FAT32-analyzer/master/images/4.PNG)
+![How to use it to analyze MBR?](https://raw.githubusercontent.com/Jameeeees/FAT32-analyzer/master/images/1.PNG)
+![How to use it to analyze VBR?](https://raw.githubusercontent.com/Jameeeees/FAT32-analyzer/master/images/2.PNG)
+![File analyzation](https://raw.githubusercontent.com/Jameeeees/FAT32-analyzer/master/images/4.PNG)
 
 
-[!How to read long file name?](https://raw.githubusercontent.com/Jameeeees/FAT32-analyzer/master/images/how-to-read-long-file-name.PNG)
-[!How to recover files?](https://raw.githubusercontent.com/Jameeeees/FAT32-analyzer/master/images/how-to-recover-files.PNG)
-[!How to decode date?](https://raw.githubusercontent.com/Jameeeees/FAT32-analyzer/master/images/how-to-decode-date.PNG)
+![How to read long file name?](https://raw.githubusercontent.com/Jameeeees/FAT32-analyzer/master/images/how-to-read-long-file-name.PNG)
+![How to recover files?](https://raw.githubusercontent.com/Jameeeees/FAT32-analyzer/master/images/how-to-recover-files.PNG)
+![How to decode date?](https://raw.githubusercontent.com/Jameeeees/FAT32-analyzer/master/images/how-to-decode-date.PNG)
