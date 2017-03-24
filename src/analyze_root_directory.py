@@ -5,7 +5,7 @@ from util import *
 import sys
 import ctypes
 
-undelete_lib = ctypes.CDLL('/mnt/hgfs/For-Linux/digital_forensics/undelete_lib.so')
+# undelete_lib = ctypes.CDLL('/mnt/hgfs/For-Linux/digital_forensics/undelete_lib.so')
 
 
 def find_root_directory(mbr, reserved_area, fat, start_cluster, sectors_per_cluster, device_name):

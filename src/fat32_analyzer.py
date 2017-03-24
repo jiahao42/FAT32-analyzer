@@ -68,6 +68,9 @@ elif sys.argv[1] == '-a':  # 自动执行所有命令
     set_device_name(device_name)
     filename = device_name + "_VBR"
     # sectors_to_skip = raw_input("Please input the sectors to skip: ")
+    # print "lba:",
+    # print global_var.lba_address
+	
     analyze_vbr(global_var.lba_address, device_name, filename)
     find_root_directory(global_var.lba_address, global_var.reserved_area, global_var.fat, global_var.start_cluster,
                         global_var.sectors_per_cluster, global_var.device_name)
