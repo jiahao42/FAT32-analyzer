@@ -19,16 +19,11 @@ def find_lba(device_name):
     content = fp.read(512)
     fp.close()
     # print content
-    signature_value = []
-    partition1 = []
-    partition2 = []
-    partition3 = []
-    partition4 = []
-    partition1 = find_partition(content, 446, partition1)  # 下面三个分区可以依据情况优化
-    partition2 = find_partition(content, 462, partition2)
-    partition3 = find_partition(content, 478, partition3)
-    partition4 = find_partition(content, 494, partition4)
-    signature_value = get_signature_value(content, signature_value)
+    partition1 = find_partition(content, 446)  # 下面三个分区可以依据情况优化
+    partition2 = find_partition(content, 462)
+    partition3 = find_partition(content, 478)
+    partition4 = find_partition(content, 494)
+    signature_value = get_signature_value(content)
     print "\n**********************************************"
     print "/////Here is the info of partition 1" + "\\\\\\\\\\"
     print "**********************************************"
@@ -59,16 +54,18 @@ def find_lba(device_name):
         print "Partition 4 NOT EXIST!!!!!!"
 
 
-def find_partition(content, start, partition):  # 找到各自的分区数据
+def find_partition(content, start):  # 找到各自的分区数据
+    partition = []
     for i in range(16):
         partition.append(content[start + i])
     return partition
 
 
-def get_signature_value(content, temp):  # 找到扇区结束符
-    temp.append(content[510])
-    temp.append(content[511])
-    return temp
+def get_signature_value(content):  # 找到扇区结束符
+    signature_value = []
+    signature_value.append(content[510])
+    signature_value.append(content[511])
+    return signature_value
 
 
 def analyze_partition(partition):
