@@ -11,11 +11,9 @@ import ctypes
 def find_root_directory(mbr, reserved_area, fat, start_cluster, sectors_per_cluster, device_name):
     root_directory = int(mbr) + int(reserved_area) + 2 * int(fat) + (int(start_cluster) - 2) * int(sectors_per_cluster)
     filename = device_name + "_root_directory"
-    # print "dd if=/dev/" + device_name + " skip=" + str(root_directory)
-    # + " count=" + str(get_sectors()) + ">" + filename
-    print str(root_directory)
+    # print str(root_directory)
     result = commands.getstatusoutput(
-        "dd if=/dev/" + device_name + " skip=" + str(root_directory) + " count=" + str(get_sectors()) + ">" + filename)
+        "sudo dd if=/dev/" + device_name + " skip=" + str(root_directory) + " count=" + str(get_sectors()) + ">" + filename)
     if result[0] != 0:
         sys.exit("Failed to execute !!! Please CHECK your input !!!")
     recover_name = []  # 0-11
@@ -75,8 +73,6 @@ def find_root_directory(mbr, reserved_area, fat, start_cluster, sectors_per_clus
                 for i in file_info:
                     del i[:]
                 is_done(accumulation, sum_bytes)
-                # temp = fp.read(32)
-                # accumulation += 32
 
 
 def analyze_long_file(data, file_info, lines):

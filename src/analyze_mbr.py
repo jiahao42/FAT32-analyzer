@@ -12,7 +12,7 @@ def find_lba(device_name):
     filename = device_name + "_MBR"
     # os.system("dd if=/dev/" + device_name + " count=1 > " + filename)
     # 下面通过getstatusoutput方法来获取shell命令的返回值 若没有返回成功 则打印错误信息并退出
-    result = commands.getstatusoutput("dd if=/dev/" + device_name + " count=1 > " + filename)
+    result = commands.getstatusoutput("sudo dd if=/dev/" + device_name + " count=1 > " + filename)
     if result[0] != 0:
         sys.exit("WRONG device name !!! Please CHECK your input !!!")
     fp = open(filename, "r")

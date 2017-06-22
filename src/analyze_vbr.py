@@ -10,7 +10,7 @@ import sys
 
 def analyze_vbr(sectors_to_skip, device_name, filename):
     result = commands.getstatusoutput(
-        "dd if=/dev/" + device_name + " skip=" + str(sectors_to_skip) + " count=1 > " + filename)
+        "sudo dd if=/dev/" + device_name + " skip=" + str(sectors_to_skip) + " count=1 > " + filename)
     if result[0] != 0:
         sys.exit("Failed to execute !!! Please CHECK your input !!!")
     fp = open(filename, 'r')

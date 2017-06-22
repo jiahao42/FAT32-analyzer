@@ -6,7 +6,7 @@ import sys
 
 def write_to_disk(path, offset, signal):
     result = commands.getstatusoutput(
-        "./undelete_long " + path + " " + str(offset) + " " + signal)
+        "sudo ./undelete_long " + path + " " + str(offset) + " " + signal)
     if result[0] != 0:
         sys.exit("Failed to execute !!! check your PATH please !!!")
     print "A Byte has been changed !!!" + "  offset: " + str(offset)  + "  changed to: " + str(signal)
@@ -15,7 +15,7 @@ def recover_file(mbr, reserved_area, fat, start_cluster, sectors_per_cluster, de
     root_directory = int(mbr) + int(reserved_area) + 2 * int(fat) + (int(start_cluster) - 2) * int(sectors_per_cluster)
     filename = device_name + "_root_directory"
     result = commands.getstatusoutput(
-        "dd if=/dev/" + device_name + " skip=" + str(root_directory) + " count=" + str(get_sectors()) + ">" + filename)
+        "sudo dd if=/dev/" + device_name + " skip=" + str(root_directory) + " count=" + str(get_sectors()) + ">" + filename)
     if result[0] != 0:
         sys.exit("WRONG device name !!! Please CHECK your input !!!")
     fp = open(filename, 'rb')
@@ -34,7 +34,7 @@ def recover_file(mbr, reserved_area, fat, start_cluster, sectors_per_cluster, de
                 print "Start to recover a file...: "
                 offset = root_directory * 512 + accumulation - 32  # + accumulation - 64
                 path = "/dev/" + device_name
-                result = commands.getstatusoutput("./undelete_short " + path + " " + str(offset))
+                result = commands.getstatusoutput("sudo ./undelete_short " + path + " " + str(offset))
                 if result[0] != 0:
                     sys.exit("Failed to execute !!! check your PATH please !!!")
                 print "A Byte has been changed !!!" + "  offset: " + str(offset)
@@ -43,7 +43,7 @@ def recover_file(mbr, reserved_area, fat, start_cluster, sectors_per_cluster, de
         else:  # 是长文件名 长文件需要再读 n * 32Bytes 数据
             if is_delete(temp):
                 is_done(accumulation, sum_bytes)
-                print "Start to recover a file...: "
+                print "Start to recover files...: "
                 offset = root_directory * 512 + accumulation - 32
                 important_offset = offset       # 第一行的第一个字节的偏移量 代表行数 重要
                 path = "/dev/" + device_name
@@ -51,18 +51,11 @@ def recover_file(mbr, reserved_area, fat, start_cluster, sectors_per_cluster, de
                 accumulation += 32
                 temp += one_more_line  # 因为长文件至少占两行 所以直接向下读一行作为判断无风险
                 second_line_offset = root_directory * 512 + accumulation - 32  # 第二行的偏移量
-                # result = commands.getstatusoutput("./undelete_long " + path + " " + str(offset) + " V")
-                # if result[0] != 0:
-                    # sys.exit("Failed to execute !!! check your PATH please !!!")
-                # print "A Byte has been changed !!!" + "  offset: " + str(offset) + "  changed to: " + str(final_lines)
                 third_line_offset = 0
                 while recover_long_file_is_end(one_more_line):
                     one_more_line = fp.read(32)
                     accumulation += 32
                     third_line_offset = root_directory * 512 + accumulation - 32
-                    # result = commands.getstatusoutput("./undelete_long " + path + " " + str(offset) + " V")
-                    # if result[0] != 0:
-                        # sys.exit("Failed to execute !!! check your PATH please !!!")
                     temp += one_more_line
                 final_lines = len(temp) / 32       # 最后再填写第一行的数据 因为要表示该长文件共占几行
                 signal = chr(0x3f + final_lines)
@@ -71,6 +64,7 @@ def recover_file(mbr, reserved_area, fat, start_cluster, sectors_per_cluster, de
                 if third_line_offset == 0: # 如果一共只有两行
                     write_to_disk(path, second_line_offset, "V")
                 else: # 如果有两行以上 此处只考虑了三行
+					# TODO
                     final_lines -= 2
                     signal = chr(final_lines)
                     write_to_disk(path, second_line_offset, signal)
