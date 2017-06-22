@@ -13,6 +13,7 @@ def find_root_directory(mbr, reserved_area, fat, start_cluster, sectors_per_clus
     filename = device_name + "_root_directory"
     # print "dd if=/dev/" + device_name + " skip=" + str(root_directory)
     # + " count=" + str(get_sectors()) + ">" + filename
+    print str(root_directory)
     result = commands.getstatusoutput(
         "dd if=/dev/" + device_name + " skip=" + str(root_directory) + " count=" + str(get_sectors()) + ">" + filename)
     if result[0] != 0:

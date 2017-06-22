@@ -103,7 +103,11 @@ def output_file_size(size):
 
 
 def is_short(data):  # 是否是短文件名
-    if ord(data[11]) == 0x0f:
+    try:
+        signal = ord(data[11])
+    except IndexError:
+        return True
+    if signal == 0x0f:
         return False
     return True
 
@@ -111,7 +115,11 @@ def is_short(data):  # 是否是短文件名
 def is_delete(data):  # 是否是被删除文件
     # print "is deleted: ",
     # if ord(data[0]) == 0x00 or ord(data[0]) == 0xe5:
-    if ord(data[0]) == 0xe5:
+    try:
+        signal = ord(data[0])
+    except IndexError:
+        return False
+    if signal == 0xe5:
         return True
     return False
 
@@ -124,7 +132,10 @@ def is_done(accumulation, sum_bytes):
 
 
 def recover_long_file_is_end(data):
-    signal = ord(data[11])
+    try:
+        signal = ord(data[11])
+    except IndexError:
+        return False
     essential_symbol = [0x08, 0x10, 0x20, 0x04, 0x02, 0x01]
     if signal in essential_symbol:
         return False
