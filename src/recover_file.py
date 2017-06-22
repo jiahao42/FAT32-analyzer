@@ -4,6 +4,12 @@ import commands
 from util import *
 import sys
 
+def write_to_disk(path, offset, signal):
+    result = commands.getstatusoutput(
+        "./undelete_long " + path + " " + str(offset) + " " + signal)
+    if result[0] != 0:
+        sys.exit("Failed to execute !!! check your PATH please !!!")
+    print "A Byte has been changed !!!" + "  offset: " + str(offset)  + "  changed to: " + str(signal)
 
 def recover_file(mbr, reserved_area, fat, start_cluster, sectors_per_cluster, device_name):
     root_directory = int(mbr) + int(reserved_area) + 2 * int(fat) + (int(start_cluster) - 2) * int(sectors_per_cluster)
@@ -44,27 +50,31 @@ def recover_file(mbr, reserved_area, fat, start_cluster, sectors_per_cluster, de
                 one_more_line = fp.read(32)  # 一直向下读32个字节 直到第0xb个字节为0x10 或 0x20为止
                 accumulation += 32
                 temp += one_more_line  # 因为长文件至少占两行 所以直接向下读一行作为判断无风险
-                offset = root_directory * 512 + accumulation - 32  # 第二行的偏移量
-                result = commands.getstatusoutput("./undelete_long " + path + " " + str(offset) + " V")
-                if result[0] != 0:
-                    sys.exit("Failed to execute !!! check your PATH please !!!")
-                print "A Byte has been changed !!!" + "  offset: " + str(offset)
+                second_line_offset = root_directory * 512 + accumulation - 32  # 第二行的偏移量
+                # result = commands.getstatusoutput("./undelete_long " + path + " " + str(offset) + " V")
+                # if result[0] != 0:
+                    # sys.exit("Failed to execute !!! check your PATH please !!!")
+                # print "A Byte has been changed !!!" + "  offset: " + str(offset) + "  changed to: " + str(final_lines)
+                third_line_offset = 0
                 while recover_long_file_is_end(one_more_line):
                     one_more_line = fp.read(32)
                     accumulation += 32
-                    offset = root_directory * 512 + accumulation - 32
-                    result = commands.getstatusoutput("./undelete_long " + path + " " + str(offset) + " V")
-                    if result[0] != 0:
-                        sys.exit("Failed to execute !!! check your PATH please !!!")
-                    print "A Byte has been changed !!!" + "  offset: " + str(offset)
+                    third_line_offset = root_directory * 512 + accumulation - 32
+                    # result = commands.getstatusoutput("./undelete_long " + path + " " + str(offset) + " V")
+                    # if result[0] != 0:
+                        # sys.exit("Failed to execute !!! check your PATH please !!!")
                     temp += one_more_line
                 final_lines = len(temp) / 32       # 最后再填写第一行的数据 因为要表示该长文件共占几行
                 signal = chr(0x3f + final_lines)
-                result = commands.getstatusoutput(
-                    "./undelete_long " + path + " " + str(important_offset) + " " + signal)
-                if result[0] != 0:
-                    sys.exit("Failed to execute !!! check your PATH please !!!")
-                print "A Byte has been changed !!!" + "  offset: " + str(offset)
+                write_to_disk(path, important_offset, signal)
+                # 
+                if third_line_offset == 0: # 如果一共只有两行
+                    write_to_disk(path, second_line_offset, "V")
+                else: # 如果有两行以上 此处只考虑了三行
+                    final_lines -= 2
+                    signal = chr(final_lines)
+                    write_to_disk(path, second_line_offset, signal)
+                    write_to_disk(path, third_line_offset, "V")
             else:
                 lines = ord(temp[0]) - 0x40  # 需要再读的行数
                 fp.read(lines * 32)  # 文件所有的信息都在此
