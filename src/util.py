@@ -136,7 +136,7 @@ def recover_long_file_is_end(data):
         signal = ord(data[11])
     except IndexError:
         return False
-    essential_symbol = [0x08, 0x10, 0x20, 0x04, 0x02, 0x01]
+    essential_symbol = [0x08, 0x10, 0x20, 0x04, 0x02, 0x01, 0x16]
     if signal in essential_symbol:
         return False
     else:
