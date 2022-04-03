@@ -12,30 +12,30 @@ import global_var
 
 
 def show_help():
-    print "\nUsage: "
-    print "\tpython fat32_analyzer.py [options] [argument]\n"
+    print("\nUsage: ")
+    print("\tpython fat32_analyzer.py [options] [argument]\n")
 
-    print "Options: "
-    print '%-25s' % "-h, -- help",
-    print '%-40s' % "get help"
+    print("Options: ")
+    print('%-25s' % "-h, -- help", end=' ')
+    print('%-40s' % "get help")
 
-    print '%-25s' % "-s [sectors]",
-    print '%-40s' % "change the number of sectors that you want to read "
+    print('%-25s' % "-s [sectors]", end=' ')
+    print('%-40s' % "change the number of sectors that you want to read ")
 
-    print '%-25s' % "-m [device]",
-    print '%-40s' % "analyze the MBR"
+    print('%-25s' % "-m [device]", end=' ')
+    print('%-40s' % "analyze the MBR")
 
-    print '%-25s' % "-v [device] [sectors]",
-    print '%-40s' % "analyze the VBR, MUST input the sectors to skip"
+    print('%-25s' % "-v [device] [sectors]", end=' ')
+    print('%-40s' % "analyze the VBR, MUST input the sectors to skip")
 
     # print '%-25s' % "-r [mbr] [reserved area] [fat] [start cluster] [sectors per cluster] [device], -- root directory"
     # print '%-40s' % "analyze the root directory"
 
-    print '%-25s' % "-a [device] ",
-    print '%-40s' % "analyze things above"
+    print('%-25s' % "-a [device] ", end=' ')
+    print('%-40s' % "analyze things above")
 
-    print '%-25s' % "-r [device] ",
-    print '%-40s' % "recover file as possible"
+    print('%-25s' % "-r [device] ", end=' ')
+    print('%-40s' % "recover file as possible")
 
 
 if len(sys.argv) == 1:
@@ -83,8 +83,8 @@ elif sys.argv[1] == '-r':
     filename = device_name + "_VBR"
     # sectors_to_skip = raw_input("Please input the sectors to skip: ")
     analyze_vbr(global_var.lba_address, device_name, filename)
-    print "\n**********************************************"
-    print "Here is the Bytes which has been changed: "
+    print("\n**********************************************")
+    print("Here is the Bytes which has been changed: ")
     recover_file(global_var.lba_address, global_var.reserved_area, global_var.fat, global_var.start_cluster,
                  global_var.sectors_per_cluster,
                  global_var.device_name)

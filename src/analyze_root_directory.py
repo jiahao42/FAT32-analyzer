@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # coding=utf-8
-import commands
+import subprocess
 from util import *
 import sys
 import ctypes
@@ -12,7 +12,7 @@ def find_root_directory(mbr, reserved_area, fat, start_cluster, sectors_per_clus
     root_directory = int(mbr) + int(reserved_area) + 2 * int(fat) + (int(start_cluster) - 2) * int(sectors_per_cluster)
     filename = device_name + "_root_directory"
     # print str(root_directory)
-    result = commands.getstatusoutput(
+    result = subprocess.getstatusoutput(
         "sudo dd if=/dev/" + device_name + " skip=" + str(root_directory) + " count=" + str(get_sectors()) + ">" + filename)
     if result[0] != 0:
         sys.exit("Failed to execute !!! Please CHECK your input !!!")
@@ -86,9 +86,9 @@ def analyze_long_file(data, file_info, lines):
         sys.exit(
             "\nThis is all the file information.\n"
             "If you want more,\n maybe you can change the sectors using \"-s\" \n\tBye~")
-    file_name = filter(lambda x: x != '\x00', file_name)
-    file_name = filter(lambda x: x != '\xff', file_name)
-    print "Filename: ",
+    file_name = [x for x in file_name if x != '\x00']
+    file_name = [x for x in file_name if x != '\xff']
+    print("Filename: ", end=' ')
     output_char(to_integer(file_name, len(file_name)))
     long_file_info = []
     for i in range(32):
@@ -114,20 +114,20 @@ def analyze_short_file(data, file_info):
             if ord(file_info[0][i]) == 0x20:
                 file_info[0][i] = chr(0x2e)
                 break
-    file_info[0] = filter(lambda x: ord(x) != 0x20, file_info[0])       # 去除剩余空格
-    print "Filename: ",
+    file_info[0] = [x for x in file_info[0] if ord(x) != 0x20]       # 去除剩余空格
+    print("Filename: ", end=' ')
     output_char(to_integer(file_info[0], len(file_info[0])))
-    print "Create Day: ",
+    print("Create Day: ", end=' ')
     output_date(analyze_date(to_integer(little_endian(file_info[1], 2), 2)))
     # output_number(to_integer(little_endian(file_info[1], 2), 2))
-    print "Access Day: ",
+    print("Access Day: ", end=' ')
     output_date(analyze_date(to_integer(little_endian(file_info[2], 2), 2)))
     # output_number(to_integer(little_endian(file_info[2], 2), 2))
-    print "High two bytes: ",
+    print("High two bytes: ", end=' ')
     output_number(to_integer(little_endian(file_info[3], 2), 2))
-    print "Low two bytes: ",
+    print("Low two bytes: ", end=' ')
     output_number(to_integer(little_endian(file_info[4], 2), 2))
-    print "File Size: ",
+    print("File Size: ", end=' ')
     output_file_size(to_integer(little_endian(file_info[5], 4), 4))
     # output_number(to_integer(little_endian(file_info[5], 4), 4))
 
@@ -145,16 +145,16 @@ def analyze_last_line_of_long_file(data):
     file_info[2] = get_certain_info(data, 20, 2, file_info[2])
     file_info[3] = get_certain_info(data, 26, 2, file_info[3])
     file_info[4] = get_certain_info(data, 28, 4, file_info[4])
-    print "Create Day: ",
+    print("Create Day: ", end=' ')
     output_date(analyze_date(to_integer(little_endian(file_info[0], 2), 2)))
     # output_number(to_integer(little_endian(file_info[1], 2), 2))
-    print "Access Day: ",
+    print("Access Day: ", end=' ')
     output_date(analyze_date(to_integer(little_endian(file_info[1], 2), 2)))
     # output_number(to_integer(little_endian(file_info[2], 2), 2))
-    print "High two bytes: ",
+    print("High two bytes: ", end=' ')
     output_number(to_integer(little_endian(file_info[2], 2), 2))
-    print "Low two bytes: ",
+    print("Low two bytes: ", end=' ')
     output_number(to_integer(little_endian(file_info[3], 2), 2))
-    print "File Size: ",
+    print("File Size: ", end=' ')
     output_file_size(to_integer(little_endian(file_info[4], 4), 4))
     # output_number(to_integer(little_endian(file_info[5], 4), 4))
