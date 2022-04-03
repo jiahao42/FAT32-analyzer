@@ -46,4 +46,4 @@ def set_start_cluster(data):
 def set_sectors_per_cluster(data):
     global sectors_per_cluster
     sectors_per_cluster = data
-    print sectors_per_cluster
+    print(sectors_per_cluster)

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # coding=utf-8
-import commands
+import subprocess
 from util import *
 from global_var import *
 import sys
@@ -9,7 +9,7 @@ import sys
 
 
 def analyze_vbr(sectors_to_skip, device_name, filename):
-    result = commands.getstatusoutput(
+    result = subprocess.getstatusoutput(
         "sudo dd if=/dev/" + device_name + " skip=" + str(sectors_to_skip) + " count=1 > " + filename)
     if result[0] != 0:
         sys.exit("Failed to execute !!! Please CHECK your input !!!")
@@ -32,25 +32,25 @@ def analyze_vbr(sectors_to_skip, device_name, filename):
     sectors_of_one_fat = get_certain_info(content, 36, 4, sectors_of_one_fat)
     cluster_of_root_directory = get_certain_info(content, 44, 4, cluster_of_root_directory)
 
-    print "**********************************************"
-    print "Bytes per sector: "
+    print("**********************************************")
+    print("Bytes per sector: ")
     output_number(to_integer(little_endian(bytes_per_sector, 2), 2))
-    print "Sector per cluster: "
+    print("Sector per cluster: ")
     output_number(to_integer(little_endian(sectors_per_cluster, 1), 1))
-    print "Size in sectors of reserved area: "
+    print("Size in sectors of reserved area: ")
     output_number(to_integer(little_endian(size_in_sectors_reserved_area, 2), 2))
     set_reserved_area(size_in_sectors_reserved_area)
-    print "Number of FATs: "
+    print("Number of FATs: ")
     output_number(to_integer(little_endian(number_of_fats, 1), 1))
-    print "Sectors of one FAT area: "
+    print("Sectors of one FAT area: ")
     output_number(to_integer(little_endian(sectors_of_one_fat, 4), 4))
     set_fat(sectors_of_one_fat)
-    print "Cluster where root directory can be found: "
+    print("Cluster where root directory can be found: ")
     output_number(to_integer(little_endian(cluster_of_root_directory, 4), 4))
     set_start_cluster(cluster_of_root_directory)
-    print "Maximum number of files in the root directory: "
+    print("Maximum number of files in the root directory: ")
     output_number(to_integer(little_endian(max_files_root_directory, 2), 2))
-    print "**********************************************"
+    print("**********************************************")
 
 
 def little_endian(data, length):  # 转换成小端法表示
@@ -60,7 +60,7 @@ def little_endian(data, length):  # 转换成小端法表示
 
 
 if __name__ == '__main__':
-    sectors = raw_input("Please input the sectors to skip: ")
+    sectors = input("Please input the sectors to skip: ")
     device = "sdb"
     filename = device + "_VBR"
     analyze_vbr(sectors, device, filename)

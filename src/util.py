@@ -15,14 +15,14 @@ def output_number(data):  # 以hex输出
     output = "\t0x"
     for i in data:
         output += '%02x' % i  # 格式化输出 不足的地方在前面用0补齐
-    print output
+    print(output)
 
 
 def output_char(data):
     output = ""
     for i in data:
         output += chr(i)
-    print output
+    print(output)
 
 
 def get_certain_info(data, start, length, address):  # 获取一段数据中特定几个字节的信息
@@ -66,8 +66,8 @@ def show_sectors():  # 读取文件的配置信息 读入的sector数
     content = fp.read()
     temp = '{' + content + '}'
     temp_dict = simplejson.loads(str(temp))
-    print "Now the sectors to read is: ",
-    print temp_dict["sectors"]
+    print("Now the sectors to read is: ", end=' ')
+    print(temp_dict["sectors"])
 
 
 def analyze_date(data):
@@ -80,26 +80,26 @@ def analyze_date(data):
 
 
 def output_date(date):
-    print date[0] + 1980,
-    print '\\',
-    print date[1],
-    print '\\',
-    print date[2]
+    print(date[0] + 1980, end=' ')
+    print('\\', end=' ')
+    print(date[1], end=' ')
+    print('\\', end=' ')
+    print(date[2])
 
 
 def output_file_size(size):
     file_size = size[0] * 0x1000000 + size[1] * 0x10000 + size[2] * 0x100 + size[3]
     if file_size > 1048546:
         file_size /= 1048546
-        print file_size,
-        print "MegaBytes\n"
+        print(file_size, end=' ')
+        print("MegaBytes\n")
     elif file_size > 10240:
         file_size /= 1024
-        print file_size,
-        print "KiloBytes\n"
+        print(file_size, end=' ')
+        print("KiloBytes\n")
     else:
-        print file_size,
-        print "Bytes\n"
+        print(file_size, end=' ')
+        print("Bytes\n")
 
 
 def is_short(data):  # 是否是短文件名
@@ -144,6 +144,6 @@ def recover_long_file_is_end(data):
 
 
 if __name__ == '__main__':
-    sectors = raw_input("Please input the number of sectors that you want to read: ")
+    sectors = input("Please input the number of sectors that you want to read: ")
     change_sectors(sectors)
     show_sectors()
