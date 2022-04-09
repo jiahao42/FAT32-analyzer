@@ -1,20 +1,20 @@
 #!/usr/bin/env python
 # coding=utf-8
-import commands
+import subprocess
 from util import *
 import sys
 
 def write_to_disk(path, offset, signal):
-    result = commands.getstatusoutput(
+    result = subprocess.getstatusoutput(
         "sudo ./undelete_long " + path + " " + str(offset) + " " + signal)
     if result[0] != 0:
         sys.exit("Failed to execute !!! check your PATH please !!!")
-    print "A Byte has been changed !!!" + "  offset: " + str(offset)  + "  changed to: " + str(signal)
+    print("A Byte has been changed !!!" + "  offset: " + str(offset)  + "  changed to: " + str(signal))
 
 def recover_file(mbr, reserved_area, fat, start_cluster, sectors_per_cluster, device_name):
     root_directory = int(mbr) + int(reserved_area) + 2 * int(fat) + (int(start_cluster) - 2) * int(sectors_per_cluster)
     filename = device_name + "_root_directory"
-    result = commands.getstatusoutput(
+    result = subprocess.getstatusoutput(
         "sudo dd if=/dev/" + device_name + " skip=" + str(root_directory) + " count=" + str(get_sectors()) + ">" + filename)
     if result[0] != 0:
         sys.exit("WRONG device name !!! Please CHECK your input !!!")
@@ -31,19 +31,19 @@ def recover_file(mbr, reserved_area, fat, start_cluster, sectors_per_cluster, de
         if is_short(temp):  # 是短文件名
             if is_delete(temp):
                 is_done(accumulation, sum_bytes)
-                print "Start to recover a file...: "
+                print("Start to recover a file...: ")
                 offset = root_directory * 512 + accumulation - 32  # + accumulation - 64
                 path = "/dev/" + device_name
-                result = commands.getstatusoutput("sudo ./undelete_short " + path + " " + str(offset))
+                result = subprocess.getstatusoutput("sudo ./undelete_short " + path + " " + str(offset))
                 if result[0] != 0:
                     sys.exit("Failed to execute !!! check your PATH please !!!")
-                print "A Byte has been changed !!!" + "  offset: " + str(offset)
+                print("A Byte has been changed !!!" + "  offset: " + str(offset))
             else:
                 is_done(accumulation, sum_bytes)
         else:  # 是长文件名 长文件需要再读 n * 32Bytes 数据
             if is_delete(temp):
                 is_done(accumulation, sum_bytes)
-                print "Start to recover files...: "
+                print("Start to recover files...: ")
                 offset = root_directory * 512 + accumulation - 32
                 important_offset = offset       # 第一行的第一个字节的偏移量 代表行数 重要
                 path = "/dev/" + device_name
